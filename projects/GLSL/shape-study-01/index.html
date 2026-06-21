@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shapes Study I</title>
+
+  <link rel="icon" type="image/jpeg" href="/images/baimo.jpg" />
+  <link rel="stylesheet" href="/css/print/index.css" media="print">
+  <link rel="stylesheet" href="/css/screen/index.css" media="screen">
+
+</head>
+<body>
+  <div id="container">
+    <div id="header">
+      <div id="logo">
+        <a href title="Baimo" class="nohover">
+          <img src="/images/baimo.png" width="109" height="22" alt="Baimo" border="0">
+        </a>
+      </div>
+    
+      <div id="nav">
+        <a href="">calender.</a>
+        <a href="">projects.</a>
+        <a href="">texts.</a>
+        <a href="">bio.</a>
+        <a href="">contact.</a>
+        <a href="">new.</a>
+      </div>
+    
+      <div id="fingertoy">
+        <a href="" class="nohover">
+          <img src="/images/fingertoy.jpg" width="42" height="32" border="0">
+        </a>
+      </div>
+    </div>
+
+    <div id="main">
+      <!-- print header -->
+      <div id="printheader"> 
+        <img src="/images/baim_print.png" width="109" height="22" alt="Flong" border="0">
+        <br>
+        <br>
+        " Printed from www.flong.com "
+        <br>
+        " Contents © 2020 Baimo and Collaborators "
+        <br>
+        <hr>
+      </div>
+
+      <div id="pagetitle">
+        <h1>Baimo and Collaborators</h1>
+        <h2>projects</h2>
+      </div>
+      
+      <div id="leftsplit-wrap">
+        <div id="leftsplit-left">
+          <p>
+            Sort by :<a href="/index.html" title="Sort by author">Author</a> | <a href="/index.html" title="Sort by date">Date</a> | <a href="/index.html" title="Sort by name">Name</a> | <a href="/index.html" title="Sort by type">Type</a>
+          </p>
+          <p>
+            &lt; <a href="/index.html">project thumbnails</a>
+          </p>
+          <hr>
+          <ul class="leftnav">
+            <li><strong> GLSL </strong></li>
+              <li><a href="/projects/GLSL/phase-study-01/index.html" title="Phase Study I">Phase Study I</a></li>
+              <li>Phase Study II</li>
+              <li>Phase Study III</li>
+              <li>Phase Study IV</li>
+              <li>Phase Study V</li>
+              <li><a href="/projects/GLSL/shape-study-01/index.html" title="Shapes Study I">Shapes Study I</a></li>
+            <li>&nbsp;</li>
+            <li><strong> Three.js </strong></li>
+              <li>AAAAAA</li>
+              <li>AAAAAA</li>
+              <li>AAAAAA</li>
+              <li>AAAAAA</li>
+              <li>AAAAAA</li>
+            <li>&nbsp;</li>
+          </ul>
+        </div>
+        <div id="leftsplit-right">
+          <h1>Shapes Study I</h1>
+          <p id="project-subtitle">2026 | Baimo</p>
+          <p>该篇主要收录 本人临摹 蒙德里安(Piet Mondrian, 1827~1944)作品成果</p>
+          <strong><em>Work.1 -- Tableua</em></strong>
+          <br>
+          <canvas id="shaderCanvas"></canvas>
+          <script type="module" src="./preview.js"></script>
+          <p><pre>//--------------------
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
+
+float line_up(float x, vec2 st){
+    return 1.0 - step( abs(st.x - x), 0.013);
+}
+
+float line_right(float y, vec2 st){
+    return 1.0 - step( abs(st.y - (1.0 - y)), 0.012);
+}
+
+float color_area(vec2 point1, vec2 point2, vec2 st){
+   vec2 result_point = vec2(0.0); 
+    vec2 distance = vec2( abs(point1.x - point2.x), abs(point1.y - point2.y) );
+    vec2 mid = vec2( (point1.x + point2.x)/2.0, (point1.y + point2.y)/2.0 );
+    
+    result_point.x = step( abs(st.x - mid.x), distance.x / 2.0);
+    result_point.y = step( abs(st.y - mid.y), distance.y / 2.0);
+    
+    float result = result_point.x * result_point.y;
+   return result;
+}
+
+void main(){
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+    vec3 color = vec3(0.9686, 0.9412, 0.8706);
+    
+    vec3 colorA = vec3(0.9686, 0.9412, 0.8706);
+    vec3 colorB = vec3(0.7216, 0.1373, 0.1451);
+    vec3 colorC = vec3(0.0118, 0.3765, 0.6157);
+    vec3 colorD = vec3(0.9647, 0.7373, 0.1647);
+
+    // bottom-left
+    //vec2 bl = step(vec2(0.006),st);
+    float pct = 1.0;
+
+    // top-right
+    //vec2 tr = step(vec2(0.006),1.0-st);
+    //pct *= tr.x * tr.y;
+
+    float line1 = (line_up(0.1425, st) )* line_up(0.26625, st) * line_up(0.70875, st) * line_up(0.89, st);
+    float line2 = line_right(0.1785, st) * line_right(0.365, st) * line_right(0.91625, st);
+    
+    pct *= line1 * line2 ;
+    
+    
+    float maskB  = color_area( vec2(0.000,1.00) ,vec2(0.255,0.630), st);
+    float maskC  = color_area( vec2(1.00,0.00) ,vec2(0.710,0.080), st);
+    float maskD  = color_area( vec2(1.00,1.00) ,vec2(0.880,0.635), st);
+    float maskA  = color_area( vec2(0.00,0.00), vec2(0.25, 0.25), st );
+    
+    color *= vec3(pct);
+    color = mix(color, colorB, maskB * pct);    
+    color = mix(color, colorC, maskC * pct);   
+    color = mix(color, colorD, maskD * pct);    
+    color = mix(color, colorA, 0.0);
+
+    gl_FragColor = vec4(color,1.0);
+}
+          </pre></p>
+          <p>实现思路:
+            <li>线条: 在<em>line</em>函数中, 使用<em>step</em>函数实现对线条位置粗细的控制</li>
+            <li>色块: 在<em>area</em>函数中, 通过给定两个vec2变量点, 实现mask.x * mask.y 的标记返回值, 接下来以meshB, 使用mix进行颜色混合, 使得色块在图形中进行显示</li>
+          </p>
+
+          <li>缺点: 左下角的线条未达到覆盖的效果, 最好改用矩形函数代替线条函数进行绘制, 也方便了色块的填充</li>
+          <p style="color: #bbb; font-size: 13px; text-align: right;">
+            Baimo · 2026-06-21
+          </p>
+        </div>
+      </div>
+
+      <div style="clear: both;"></div>
+    </div>
+
+    <div id="footer">
+      Contents © 2026 Baimo and Collaborators. 
+      <span id="flingflong">We filing Baimo all day long</span>      
+    </div>
+  </div>
+</body>
+</html>
