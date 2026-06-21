@@ -1,15 +1,9 @@
 console.log("preview loaded");
 import * as THREE from "three";
 // import { uniform } from "three/tsl";
+import fragmentShader from './shader.frag?raw'
 
 const canvas = document.querySelector("#shaderCanvas")
-// const sourceBlock = document.querySelector("#shaderSource");
-
-const fragmentShader =
-    await fetch("./shader.frag")
-    .then(res => res.text());
-
-// sourceBlock.textContent = fragmentShader;
 
 // 顶点着色器
 const vertexShader = `
