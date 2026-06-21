@@ -7,6 +7,7 @@ const canvas = document.querySelector("#shaderCanvas")
 const fragmentShader =
     await fetch("./shader.frag")
     .then(res => res.text());
+console.log(fragmentShader)    
 
 // sourceBlock.textContent = fragmentShader;
 
