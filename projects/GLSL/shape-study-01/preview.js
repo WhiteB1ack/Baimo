@@ -1,13 +1,21 @@
 import * as THREE from "three";
 // import { uniform } from "three/tsl";
 
+console.log("preview version 2026-06-21-01");
+
 const canvas = document.querySelector("#shaderCanvas")
 // const sourceBlock = document.querySelector("#shaderSource");
 
-const fragmentShader =
-    await fetch("./shader.frag")
-    .then(res => res.text());
-console.log(fragmentShader)    
+const fragmentShader = await fetch("./shader.frag")
+  .then(async (res) => {
+    console.log("shader status:", res.status);
+    const text = await res.text();
+
+    console.log("shader content:");
+    console.log(text);
+
+    return text;
+  });
 
 // sourceBlock.textContent = fragmentShader;
 
@@ -22,6 +30,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas,
   antialias: true
 });
+renderer.debug.checkShaderErrors = true;
 
 // Scene
 const scene = new THREE.Scene()
@@ -34,11 +43,13 @@ const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
 
+  glslVersion: THREE.GLSL1,
+
   uniforms: {
     u_time: { value: 0 },
     u_resolution: { value: new THREE.Vector2() }
   }
-})
+});
 
 // 全屏平面
 const mesh = new THREE.Mesh(
