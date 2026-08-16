@@ -248,7 +248,8 @@ div.smallthumb_row{
 }
 
 div.projectgroup{
-  float: left;
+  display: flex;
+  flex-wrap: wrap;
   margin-bottom: 20px;
   width: 100%;
 }
