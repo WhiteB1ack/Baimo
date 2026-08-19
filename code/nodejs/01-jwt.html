@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/jpeg" href="/images/baimo.jpg" />
+
+  <link rel="stylesheet" href="../../css/print/index.css"   media="print">
+  <link rel="stylesheet" href="../../css/screen/index.css"  media="screen">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="container">
+
+    <div id="header">
+      <div id="logo">
+        <a href title="Baimo" class="nohover">
+          <img src="/images/baimo.png" width="109" height="22" alt="Baimo" border="0">
+        </a>
+      </div>
+    
+      <div id="nav">
+        <a href="">calender.</a>
+        <a href="">projects.</a>
+        <a href="/code/index.html">code.</a>
+        <a href="">bio.</a>
+        <a href="">contact.</a>
+        <a href="">new.</a>
+      </div>
+    
+      <div id="fingertoy">
+        <a href="" class="nohover">
+          <img src="/images/fingertoy.jpg" width="42" height="32" border="0">
+        </a>
+      </div>
+    </div>
+
+    <div id="main">
+      <!-- print header -->
+      <div id="printheader"> 
+        <img src="/images/baim_print.png" width="109" height="22" alt="Flong" border="0">
+        <br>
+        <br>
+          Printed from www.flong.com
+        <br>
+          Contents © 2020 Baimo and Collaborators
+        <br>
+        <hr>
+      </div>
+        <div id="pagetitle">
+          <h1>Baimo and Collaborators</h1>
+          <h2>Texts</h2>
+        </div>
+
+        <div id="leftsplit-wrap">
+        <div id="leftsplit-left">
+          <ul class="leftnav">
+<li><a href="./index.html">Node.js</a></li>
+<li><a href="">Misc</a></li>
+<li><a href="">Fastify</a></li>
+<li><a href="">Hono.js</a></li>
+<li><a href="">Java</a></li>
+          </ul>
+          <br>
+          <hr>
+          <br>
+          <ul class="leftnav">
+            <li>
+              08 2026
+              <a href="./01-jwt.html">01-cookies-session-token</a>
+              <br>
+            </li>
+          </ul>
+        </div>
+
+        <div id="leftsplit-right">
+          <h1>01-jwt 会话控制</h1> <br>
+          <p id="project-subtitle">2026 | Baimo</p>
+          <p><h3>cookie session token机制      /      <a href="https://github.com/WhiteB1ack/node-notebook">参考</a></h3></p>
+
+          <p><pre>
+会话控制: 对会话进行控制
+HTTP 是一种无状态的协议, 没有办法区分多词请求是否来自同一个客户端, 无法区分用户而产品又大量存在这样的需求, 
+所以我们通过会话控制来解决这个问题
+常见的会话控制技术有三种:
+cookie | session | token
+
+<h4>1. cookie</h4>cookie 是 HTTP服务器发送到用户浏览器并保存在本地的一小块数据
+浏览器向服务器发送请求时,  会自动将当前域名 可用的cookie设置在请求头中, 然后传递给服务器
+这个请求头的名字也叫cookie, 所以将 cookie理解为一个 HTTP 的请求头也是可以的
+
+//--- cookie 操作
+import cookieParser from 'cookie-parser';
+app.use(cookieParser())
+
+res.cookie('theme', 'blue')   // 设置 cookie
+res.cookie('name', 'lisi', {maxAge: 6000 * 1000}) // maxAge 生命周期
+
+res.clearCookie('name')   // 删除 cookie
+
+console.log(req.cookies)     // 获取cookie
+console.log(req.cookies.name)
+<h4>2. session</h4>session是保存在服务端的一块数据, 访问当前访问用户的相关信息
+session 实现会话控制, 可以识别用户身份, 快速获取当前用户的相关信息
+session 运行流程
+填写账号和密码校验身份, 校验通过后创建session信息, 然后将 session_id的值通过响应头返回给浏览器
+
+有了cookie, 下次发送请求时会自动携带cookie, 服务器通过cookie中的 session_id 的值确定用户身份
+//--- session 操作
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
+
+app.use(session({
+  name: 'sid',              // 设置cookie的name, 默认值是: connect.sid
+  secret: 'atguigu',        // 参加加密的字符串(又称签名) 
+  saveUninitialized: false, // 是否为每次请求都设置一个cookie用来存储session的id
+  resave: true,             // 是否在每次请求时重新保存session
+  store: MongoStore.create({
+    mongoUrl: 'mongodb://127.0.0.1:27017/bilibili'  // 数据库的连接配置
+  }),
+  cookie: {
+    httpOnly: true,         // 开启后前后端无法通过JS操作   document.cookie
+    maxAge: 1000 * 300      // 这一条 是控制 sessionID 的过期时间
+  }
+}))
+
+if(req.query.username === 'admin' && req.query.password){// 设置 session
+  req.session.username = 'admin';
+  req.session.uid = '258aefccc'
+}
+
+if(req.session.username){        // 读取session
+  res.send(req.session.username)
+}
+
+req.session.destroy(() => {     // session的销毁
+  req.session.destroy(() => {
+    res.send('退出成功');
+  })
+})
+
+<h4>session 与 cookie的区别</h4>             cookie                                     session
+存在的位置  浏览器端                                     服务端
+安全性      是以明文存放在客户端的, 安全性相对较低       存放于服务器, 所以安全性相对较好
+网络传输量  设置内容过多会增大报文体积, 会影响传输效率   数据存储在服务器, 只是通过cookie传递id, 所以不影响传输效率
+存储限制    浏览器限制单个cookie保存的数据不能超过4k, 且单个域名下的存储数量也有限制  
+            session 数据存储在服务器中, 所以没有这些限制
+
+<h4>3. token</h4>
+token 是服务端生成并返回给客户端的一串加密字符串, token中保存着用户信息
+token 实现会话控制, 可以识别用户身份, 主要用于移动端APP
+
+token 工作流程
+填写账号密码校验身份, 校验通过后响应token, token 一般是在响应体中返回给客户端
+后续再发送请求时, 需要手动将token添加在请求报文中, 一般是放在请求头中
+
+token的特点
+服务端压力更小 - 数据存储在客户端
+相对更安全 - 数据加密 可以避免CSRF(跨站请求伪造)
+扩展性更强 - 服务间可以共享 增加服务节点更简单
+<h4>4. JWT(Json Web Json)</h4>
+JWT 是目前最流行的跨域认证解决方案, 可用于基于 token的身份验证
+
+//--- 操作
+/*checkTokenMiddleware.js*/
+import jwt from 'jsonwebtoken';
+import { secret } from '../config/config.js';
+
+export const checkTokenMiddleware = (req, res, next) => {
+  // 获取token
+  let token = req.get('token');
+
+  if(!token) {
+    return res.json({
+      code: '2003',
+      msg: 'token缺失',
+      data: null
+    })
+  }
+
+    // 校验 token
+  jwt.verify(token, secret, async(err, data) => {
+    // 检测tokrn是否正确
+    if(err){
+      return res.json({
+        code: '2004',
+        msg: 'token 校验失败',
+        data: null
+      })
+    }
+
+    // 保存用户信息
+    req.user = data;  // 保存数据???
+    next()    
+  })
+}
+
+/*auth.js*/
+import express from 'express'
+import { Router } from 'express'
+import UserModel from '../../models/UserModel.js'
+import md5 from 'md5'
+import jwt from 'jsonwebtoken'
+import { secret } from '../../config/config.js'
+
+const router = Router()
+
+// 登录操作
+router.post('/login', async (req, res) => {
+  // 获取用户名和密码
+  let { username, password } = req.body;
+  
+  // 查询数据库
+  try {
+    const data = await UserModel.findOne({username: username, password: md5(password)})
+
+    console.log(data)
+    if(!data) {
+      return  res.json({
+        code: '2002',
+        msg: '用户名或密码错误',
+        data: null
+      })    
+    } 
+
+    // 创建 token
+    let token = jwt.sign({
+      username: data.username,
+      _id: data._id
+    }, secret, {
+      expiresIn: 60 * 60 * 24 * 7
+    })
+
+    // 响应token
+    res.json({
+      code: '0000',
+      msg: '登录成功',
+      data: token
+    })
+    res.render('success', {msg: '登陆成功', url: '/account'});
+  } catch {
+    res.json({
+      code: '2001',
+      msg: '数据库读取失败',
+      data: null
+    })
+  }
+})
+
+// 退出登录
+router.post('/logout', (req, res) => {
+  // 销毁session
+  req.session.destroy(() => {
+    res.render('success', {msg: '退出成功', url: '/login'})
+  })
+})
+
+export default router
+          </pre></p><hr>
+          <p style="color: #bbb; font-size: 13px; text-align: right;">
+            Baimo · 2026-06-21     
+          </p>
+        </div>
+        </div>
+
+        <div style="clear: both;"></div>
+
+      </div>
+      <div id="footer">
+        Contents © 2026 Baimo and Collaborators. 
+        <span id="flingflong">We filing Baimo all day long</span>
+      </div>
+  </div>
+</body>
+</html>
