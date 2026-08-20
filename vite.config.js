@@ -19,6 +19,10 @@ export default defineConfig({
         blenderFlag: resolve(__dirname, 'projects/Blender/flag-study-01/index.html'),
 
         asciiStudy01: resolve(__dirname, 'projects/ASCII/ASCII-study-I/index.html'),
+        
+        code: resolve(__dirname, 'code/index.html'),
+        nodejs: resolve(__dirname, 'code/nodejs/index.html'),
+        jwt: resolve(__dirname, 'code/nodejs/01-jwt.html'),
       },
       chunkSizeWarningLimit:1000
     }
